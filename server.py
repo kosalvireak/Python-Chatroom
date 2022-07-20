@@ -14,7 +14,7 @@ class Server(threading.Thread):
     """
     def __init__(self, host, port):
         super().__init__()
-        self.connections = []
+        self.connections = [] #where you store all the connections, for communicate and close.
         self.host = host
         self.port = port
     
