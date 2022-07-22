@@ -1,3 +1,4 @@
+
 import threading
 import socket
 import argparse
@@ -14,7 +15,7 @@ class Server(threading.Thread):
     """
     def __init__(self, host, port):
         super().__init__()
-        self.connections = [] #where you store all the connections, for communicate and close.
+        self.connections = []
         self.host = host
         self.port = port
     
@@ -92,13 +93,20 @@ class ServerSocket(threading.Thread):
         from the list of ServerSocket threads in the parent Server thread.
         """
         while True:
-            message = self.sc.recv(1024).decode('ascii')
-            if message:
-                print('{} says {!r}'.format(self.sockname, message))
-                self.server.broadcast(message, self.sockname)
-            else:
-                # Client has closed the socket, exit the thread
-                print('{} has closed the connection'.format(self.sockname))
+            try:
+                message = self.sc.recv(1024).decode('ascii')
+                if message:
+                    print('{} says {!r}'.format(self.sockname, message))
+                    self.server.broadcast(message, self.sockname)
+                else:
+                    # Client has closed the socket, exit the thread
+                    print('{} has closed the connection'.format(self.sockname))
+                    self.sc.close()
+                    server.remove_connection(self)
+                    return
+            except socket.error as e:
+                print(e)
+                print('{} has closed the connection',format(self.sockname))
                 self.sc.close()
                 server.remove_connection(self)
                 return
